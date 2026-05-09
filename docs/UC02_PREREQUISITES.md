@@ -40,6 +40,9 @@ SELECT id FROM auth.users WHERE email = 'your-test@email.com';
 아래 SQL에서 `{USER_ID}`를 실제 UUID로 교체 후 실행:
 
 ```sql
+-- ⚠️ 먼저 이 마이그레이션을 실행해야 합니다 (outdoor 카테고리 추가):
+ALTER TYPE category_enum ADD VALUE IF NOT EXISTS 'outdoor';
+
 -- 필수 항목만 있는 아이템 (카테고리: travel)
 INSERT INTO bucket_items (user_id, title, category, priority, status)
 VALUES
@@ -54,7 +57,7 @@ VALUES
 -- 설명과 태그가 있는 아이템 (상세조회 UC-04-2 테스트용)
 INSERT INTO bucket_items (user_id, title, category, priority, description, status)
 VALUES
-  ('{USER_ID}', '스카이다이빙 체험', 'adventure',  'high',
+  ('{USER_ID}', '스카이다이빙 체험', 'outdoor', 'high',
    '인생에서 한 번은 해봐야 할 도전. 제주도나 가평에서 진행하는 프로그램 알아보기.',
    'active')
 RETURNING id;
