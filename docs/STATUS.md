@@ -1,6 +1,6 @@
 # 개발 현황 (Status)
 
-> 마지막 업데이트: 2026-05-09 (Phase 1 E2E 검증 완료)
+> 마지막 업데이트: 2026-05-09 (Phase 2 E2E 검증 완료)
 
 ---
 
@@ -9,7 +9,7 @@
 | Phase | 이름 | 상태 | 진행률 |
 |-------|------|------|--------|
 | Phase 1 | 기반 구축 | ✅ Complete | 100% |
-| Phase 2 | 주간 추천 시스템 | ⏳ Planned | 0% |
+| Phase 2 | 주간 추천 시스템 | ✅ Complete | 100% |
 | Phase 3 | 실천 기록 | ⏳ Planned | 0% |
 | Phase 4 | 쇼츠 영상 자동 생성 | ⏳ Planned | 0% |
 | Phase 5 | 갤러리 & 공유 | ⏳ Planned | 0% |
@@ -110,12 +110,54 @@
 
 ---
 
+## Phase 2 — 주간 추천 시스템 세부 현황
+
+### 완료된 항목 ✅
+
+#### 백엔드
+- [x] 추천 알고리즘 (`server/services/recommender.py`) — 우선순위·최근성·계절·날씨 4요소 점수화
+- [x] 계절 점수 서비스 (`server/services/season.py`) — KST 기준 계절 판별 + 카테고리 가중치
+- [x] 날씨 서비스 (`server/services/weather.py`) — OpenWeatherMap API 연동, 오류 시 neutral 폴백
+- [x] 추천 API 5개 엔드포인트 (`server/routers/recommendations.py`)
+  - GET /api/v1/recommendations/current
+  - GET /api/v1/recommendations/history
+  - POST /api/v1/recommendations/generate-now (개발용)
+  - POST /api/v1/recommendations/{id}/accept
+  - POST /api/v1/recommendations/{id}/skip
+- [x] Pydantic v2 스키마 (`server/schemas/recommendation.py`)
+
+#### 프론트엔드
+- [x] 추천 API 서비스 레이어 (`services/recommendations.ts`)
+- [x] TanStack Query 훅 5종 (`hooks/useRecommendation.ts`)
+- [x] 홈 화면 추천 카드 컴포넌트 (`components/Recommendation/RecommendationCard.tsx`)
+  - 로딩 shimmer / empty state / pending / accepted / skipped 5가지 상태 렌더링
+- [x] 추천 기록 히스토리 화면 (`app/recommendations/history.tsx`) — 페이지네이션 FlatList
+- [x] 히스토리 아이템 컴포넌트 (`components/Recommendation/HistoryItem.tsx`) — 상태 배지
+- [x] 홈 화면 추천 카드 연동 + [DEV] 수동 생성 버튼 (`app/(tabs)/index.tsx`)
+
+### E2E 검증 결과 (2026-05-09)
+
+> 상세 체크리스트: [`docs/E2E_VALIDATION_PHASE2.md`](./E2E_VALIDATION_PHASE2.md)
+
+| 유저케이스 | 총 항목 | 통과 | 상태 |
+|------------|--------|------|------|
+| UC-09. 주간 추천 조회 | 4 | 4 | ✅ PASS |
+| UC-10. 추천 수락 | 2 | 2 | ✅ PASS |
+| UC-11. 추천 건너뛰기 | 2 | 2 | ✅ PASS |
+| UC-12. 추천 기록 조회 | 3 | 3 | ✅ PASS |
+| **합계** | **11항목** | **11** | ✅ **전체 통과** |
+
+**Phase 3 진입 조건: E2E 11개 항목 중 critical 실패 0건 → ✅ 충족**
+
+---
+
 ## 알려진 이슈 / 기술 부채
 
 | 항목 | 내용 | 우선순위 |
 |------|------|--------|
 | reanimated 버전 경고 | 3.16.7 사용 중 (SDK 54 권장: ~4.1.1). 기능 동작엔 문제 없음 | 추후 해결 |
-| FastAPI 서버 수동 실행 | 현재 로컬 수동 기동 필요 (포트 8002). CI/CD 미구성 | Phase 2 전 해결 |
+| FastAPI 서버 수동 실행 | 현재 로컬 수동 기동 필요 (포트 8000). CI/CD 미구성 | Phase 3 이후 |
+| [DEV] 추천 생성 버튼 | 홈 화면 하단 개발용 버튼 — 프로덕션 배포 전 제거 필요 | 배포 전 |
 
 ## 개발 환경
 
@@ -134,7 +176,7 @@
 
 | 항목 | 결정 | 이유 |
 |------|------|------|
-| 모바일 프레임워크 | React Native + Expo SDK 51 | TypeScript 일관성, 빌드 복잡도 최소화 |
+| 모바일 프레임워크 | React Native + Expo SDK 54 | TypeScript 일관성, 빌드 복잡도 최소화 |
 | 백엔드 | FastAPI (Python 3.12) | 영상처리·AI 추천에 Python 생태계 유리 |
 | 영상 처리 | FFmpeg + moviepy | 세로 영상 템플릿 합성에 검증된 조합 |
 | DB/인프라 | Supabase | DB + Auth + Storage 통합, 멀티 디바이스 동기화 |
