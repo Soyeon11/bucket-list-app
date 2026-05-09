@@ -1,8 +1,9 @@
-// Item detail screen: view and edit a bucket list item
+// Item detail screen: view, edit, and log activity for a bucket list item
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, Modal, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
+import * as ImagePicker from 'expo-image-picker';
 import {
   useBucketItem,
   useUpdateBucketItem,
@@ -13,15 +14,23 @@ import { UpdateItemPayload } from '@/services/bucketlist';
 import { BucketItemForm } from '@/components/BucketItem/BucketItemForm';
 import { Button } from '@/components/ui/Button';
 import { CATEGORY_MAP, PRIORITY_MAP } from '@/constants/categories';
+import { useActivityLogs, useCreateLog } from '@/hooks/useActivityLog';
+import LogCard from '@/components/ActivityLog/LogCard';
 
 export default function ItemDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [isEditing, setIsEditing] = useState(false);
+  const [showLogModal, setShowLogModal] = useState(false);
+  const [logNote, setLogNote] = useState('');
+  const [selectedMedia, setSelectedMedia] = useState<ImagePicker.ImagePickerAsset[]>([]);
+  const [isSubmittingLog, setIsSubmittingLog] = useState(false);
 
   const { data: item, isLoading, isError } = useBucketItem(id ?? '');
   const updateMutation = useUpdateBucketItem();
   const deleteMutation = useDeleteBucketItem();
   const completeMutation = useCompleteBucketItem();
+  const { data: logsData, isLoading: isLogsLoading } = useActivityLogs(id as string);
+  const createLog = useCreateLog();
 
   // ─── Handlers ───────────────────────────────────────────────────────────────
 
@@ -65,6 +74,42 @@ export default function ItemDetailScreen() {
       ]
     );
   }
+
+  const handlePickMedia = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsMultipleSelection: true,
+      quality: 0.8,
+      selectionLimit: 10,
+    });
+    if (!result.canceled) {
+      setSelectedMedia((prev) => [...prev, ...result.assets].slice(0, 10));
+    }
+  };
+
+  const handleSubmitLog = async () => {
+    if (!id) return;
+    setIsSubmittingLog(true);
+    try {
+      await createLog.mutateAsync({
+        itemId: id as string,
+        payload: { note: logNote.trim() || null },
+        mediaFiles: selectedMedia.map((asset, idx) => ({
+          uri: asset.uri,
+          filename: asset.fileName ?? `media_${idx + 1}.${asset.type === 'video' ? 'mp4' : 'jpg'}`,
+          mimeType: asset.mimeType ?? (asset.type === 'video' ? 'video/mp4' : 'image/jpeg'),
+          fileSize: asset.fileSize ?? 0,
+        })),
+      });
+      setLogNote('');
+      setSelectedMedia([]);
+      setShowLogModal(false);
+    } catch {
+      Alert.alert('오류', '기록 저장에 실패했어요. 다시 시도해주세요.');
+    } finally {
+      setIsSubmittingLog(false);
+    }
+  };
 
   // ─── Loading / Error states ──────────────────────────────────────────────────
 
@@ -217,7 +262,7 @@ export default function ItemDetailScreen() {
           </View>
 
           {/* Action buttons */}
-          <View className="gap-3 pb-4">
+          <View className="gap-3">
             {item.status !== 'completed' && (
               <Button
                 label="완료로 표시"
@@ -235,7 +280,95 @@ export default function ItemDetailScreen() {
               onPress={handleDelete}
             />
           </View>
+
+          {/* Activity Logs Section */}
+          <View className="mt-6 mb-4">
+            <View className="flex-row justify-between items-center mb-3">
+              <Text className="text-lg font-semibold text-gray-900">실천 기록</Text>
+              <TouchableOpacity
+                onPress={() => setShowLogModal(true)}
+                className="bg-indigo-500 px-3 py-1.5 rounded-lg"
+              >
+                <Text className="text-white text-sm font-medium">+ 기록 추가</Text>
+              </TouchableOpacity>
+            </View>
+
+            {isLogsLoading ? (
+              <ActivityIndicator size="small" color="#6366f1" />
+            ) : !logsData?.data?.length ? (
+              <Text className="text-gray-400 text-sm text-center py-4">
+                아직 기록이 없어요. 첫 번째 기록을 남겨보세요!
+              </Text>
+            ) : (
+              logsData.data.map((log) => (
+                <LogCard key={log.id} log={log} />
+              ))
+            )}
+          </View>
         </ScrollView>
+
+        {/* Log Creation Modal */}
+        <Modal
+          visible={showLogModal}
+          animationType="slide"
+          presentationStyle="pageSheet"
+          onRequestClose={() => setShowLogModal(false)}
+        >
+          <SafeAreaView className="flex-1 bg-white">
+            <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-100">
+              <TouchableOpacity onPress={() => setShowLogModal(false)}>
+                <Text className="text-gray-500">취소</Text>
+              </TouchableOpacity>
+              <Text className="font-semibold text-gray-900">기록 추가</Text>
+              <TouchableOpacity onPress={handleSubmitLog} disabled={isSubmittingLog}>
+                <Text className={`font-semibold ${isSubmittingLog ? 'text-gray-300' : 'text-indigo-500'}`}>
+                  저장
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView className="flex-1 px-4 py-4">
+              <Text className="text-sm font-medium text-gray-700 mb-2">노트 (선택)</Text>
+              <TextInput
+                value={logNote}
+                onChangeText={setLogNote}
+                placeholder="오늘의 기록을 남겨보세요..."
+                multiline
+                numberOfLines={4}
+                className="border border-gray-200 rounded-xl p-3 text-gray-700 min-h-[100px]"
+                textAlignVertical="top"
+              />
+
+              <View className="mt-4">
+                <Text className="text-sm font-medium text-gray-700 mb-2">
+                  미디어 ({selectedMedia.length}/10)
+                </Text>
+                <TouchableOpacity
+                  onPress={handlePickMedia}
+                  className="border-2 border-dashed border-gray-300 rounded-xl p-4 items-center"
+                >
+                  <Text className="text-gray-500 text-sm">사진/동영상 추가</Text>
+                </TouchableOpacity>
+
+                {selectedMedia.length > 0 && (
+                  <View className="flex-row flex-wrap gap-1 mt-2">
+                    {selectedMedia.map((asset, idx) => (
+                      <View key={idx} className="w-[31%] aspect-square bg-gray-200 rounded-lg overflow-hidden">
+                        <Image source={{ uri: asset.uri }} className="w-full h-full" resizeMode="cover" />
+                        <TouchableOpacity
+                          onPress={() => setSelectedMedia((prev) => prev.filter((_, i) => i !== idx))}
+                          className="absolute top-1 right-1 bg-black/60 rounded-full w-5 h-5 items-center justify-center"
+                        >
+                          <Text className="text-white text-xs">✕</Text>
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </View>
+            </ScrollView>
+          </SafeAreaView>
+        </Modal>
       </SafeAreaView>
     </>
   );

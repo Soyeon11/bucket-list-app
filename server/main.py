@@ -18,7 +18,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from config import get_settings
-from routers import bucketlist, recommendations, videos
+from routers import bucketlist, logs, recommendations, videos
 from schemas.common import make_error
 
 # ── Logging ────────────────────────────────────────────────────────────────────
@@ -73,6 +73,7 @@ API_PREFIX = "/api/v1"
 
 app.include_router(bucketlist.router, prefix=API_PREFIX)
 app.include_router(recommendations.router, prefix=API_PREFIX)
+app.include_router(logs.router, prefix=API_PREFIX)
 app.include_router(videos.router, prefix=API_PREFIX)
 
 # ── Health check ───────────────────────────────────────────────────────────────

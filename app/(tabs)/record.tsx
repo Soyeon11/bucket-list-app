@@ -1,22 +1,46 @@
-// Record screen placeholder — Phase 2 implementation
+// Record screen: select an active bucket list item to log activity
 import React from 'react';
-import { Text, View } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useBucketList } from '@/hooks/useBucketList';
+import { BucketItemCard } from '@/components/BucketItem/BucketItemCard';
 
 export default function RecordScreen() {
+  const { data, isLoading } = useBucketList({ status: 'active' });
+  const items = data?.data ?? [];
+
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#F9FAFB' }}>
-      <View style={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 8 }}>
-        <Text className="text-2xl font-bold text-gray-900">기록</Text>
-      </View>
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 }}>
-        <Text className="text-5xl mb-4">📸</Text>
-        <Text className="text-xl font-bold text-gray-800 mb-2">기록 화면</Text>
-        <Text className="text-sm text-gray-500 text-center">
-          Phase 2에서 구현 예정입니다.{'\n'}
-          사진/영상 업로드와 활동 기록을 남길 수 있어요.
+    <SafeAreaView className="flex-1 bg-gray-50">
+      <View className="px-4 pt-4 pb-2">
+        <Text className="text-2xl font-bold text-gray-900">실천 기록</Text>
+        <Text className="text-sm text-gray-500 mt-1">
+          아이템을 선택해서 기록을 남겨보세요
         </Text>
       </View>
+
+      {isLoading ? (
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator size="large" color="#6366f1" />
+        </View>
+      ) : items.length === 0 ? (
+        <View className="flex-1 items-center justify-center px-8">
+          <Text className="text-gray-400 text-center">
+            진행 중인 버킷리스트 아이템이 없어요.{'\n'}먼저 아이템을 추가해보세요!
+          </Text>
+        </View>
+      ) : (
+        <FlatList
+          data={items}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={{ padding: 16 }}
+          renderItem={({ item }) => (
+            <TouchableOpacity onPress={() => router.push(`/item/${item.id}`)}>
+              <BucketItemCard item={item} />
+            </TouchableOpacity>
+          )}
+        />
+      )}
     </SafeAreaView>
   );
 }
