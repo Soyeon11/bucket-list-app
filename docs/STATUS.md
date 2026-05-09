@@ -1,6 +1,6 @@
 # 개발 현황 (Status)
 
-> 마지막 업데이트: 2026-05-09
+> 마지막 업데이트: 2026-05-09 (Phase 1 E2E 검증 완료)
 
 ---
 
@@ -40,16 +40,21 @@
 - [x] Pydantic v2 스키마 + 통일 에러 응답 형식 (`schemas/`)
 - [x] SQLAlchemy 2.0 모델 (`models/`)
 - [x] DB 초기화 SQL (`migrations/001_initial_schema.sql`)
+- [x] `outdoor` 카테고리 추가 마이그레이션 (`migrations/003_add_outdoor_category.sql`)
+- [x] ES256 JWT 검증 (Supabase JWKS 엔드포인트 연동)
 - [x] Phase 2, 4용 라우터 플레이스홀더
 
 #### 프론트엔드 (프론트엔드 에이전트)
-- [x] Expo SDK 51 + TypeScript 프로젝트 설정
-- [x] NativeWind v4 + TanStack Query v5 + Zustand 설정
+- [x] Expo SDK 54 + TypeScript 프로젝트 설정
+- [x] NativeWind v4.2.3 + TanStack Query v5 + Zustand 설정
 - [x] Expo Router 네비게이션 구조 (탭 4개, 인증 플로우)
 - [x] 버킷리스트 목록 화면 (카테고리 필터, FlatList, 당겨서 새로고침, FAB)
 - [x] 아이템 추가/수정 화면 (BucketItemForm)
 - [x] 아이템 상세 화면 (완료 처리, 삭제 포함)
 - [x] API 서비스 레이어 (Axios + JWT 인터셉터, 낙관적 업데이트)
+- [x] 로그아웃 버튼 (홈 화면 우상단, 확인 알림 포함)
+- [x] Stack 네비게이터 설정 (`_layout.tsx` — 뒤로가기 버튼 활성화)
+- [x] KeyboardAvoidingView (아이템 폼 태그 입력란 키보드 대응)
 - [x] 홈/기록/갤러리 화면 플레이스홀더
 
 #### 미디어 (미디어 에이전트)
@@ -89,19 +94,19 @@
 
 > 상세 체크리스트: [`docs/E2E_VALIDATION_PHASE1.md`](./E2E_VALIDATION_PHASE1.md)
 
-| 유저케이스 | 총 항목 | 상태 |
-|------------|--------|------|
-| UC-01. 인증 | 3 | ⏳ 검증 대기 |
-| UC-02. 목록 조회 | 6 | ⏳ 검증 대기 |
-| UC-03. 아이템 생성 | 7 | ⏳ 검증 대기 |
-| UC-04. 상세 조회 | 3 | ⏳ 검증 대기 |
-| UC-05. 아이템 수정 | 4 | ⏳ 검증 대기 |
-| UC-06. 완료 처리 | 3 | ⏳ 검증 대기 |
-| UC-07. 아이템 삭제 | 3 | ⏳ 검증 대기 |
-| UC-08. 에러 처리 | 3 | ⏳ 검증 대기 |
-| **합계** | **32항목** | ⏳ 진행 중 |
+| 유저케이스 | 총 항목 | 통과 | 상태 |
+|------------|--------|------|------|
+| UC-01. 인증 | 3 | 3 | ✅ PASS |
+| UC-02. 목록 조회 | 6 | 6 | ✅ PASS |
+| UC-03. 아이템 생성 | 7 | 7 | ✅ PASS |
+| UC-04. 상세 조회 | 3 | 3 | ✅ PASS |
+| UC-05. 아이템 수정 | 4 | 4 | ✅ PASS |
+| UC-06. 완료 처리 | 3 | 3 | ✅ PASS |
+| UC-07. 아이템 삭제 | 3 | 3 | ✅ PASS |
+| UC-08. 에러 처리 | 3 | 3 | ✅ PASS |
+| **합계** | **32항목** | **32** | ✅ **전체 통과** |
 
-**Phase 2 진입 조건: E2E 32개 항목 중 critical 실패 0건**
+**Phase 2 진입 조건: E2E 32개 항목 중 critical 실패 0건 → ✅ 충족**
 
 ---
 
@@ -109,8 +114,8 @@
 
 | 항목 | 내용 | 우선순위 |
 |------|------|--------|
-| NativeWind 제거됨 | SDK 54 + reanimated 4.x 의존성 충돌로 일시 제거. StyleSheet 사용 중 | Phase 2 전 해결 |
 | reanimated 버전 경고 | 3.16.7 사용 중 (SDK 54 권장: ~4.1.1). 기능 동작엔 문제 없음 | 추후 해결 |
+| FastAPI 서버 수동 실행 | 현재 로컬 수동 기동 필요 (포트 8002). CI/CD 미구성 | Phase 2 전 해결 |
 
 ## 개발 환경
 
