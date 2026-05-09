@@ -1,0 +1,209 @@
+{
+  "name": "film",
+  "display_name": "필름",
+  "description": "시네마틱한 영화적 감성 스타일. 여행, 문화, 특별한 순간 기록에 적합합니다.",
+  "version": "1.0.0",
+
+  "background": {
+    "type": "solid",
+    "color": "#0D0D0D",
+    "intro_color": "#0D0D0D",
+    "outro_color": "#0D0D0D",
+    "gradient": null
+  },
+
+  "text_boxes": {
+    "title": {
+      "x": 540,
+      "y": 1382,
+      "width": 940,
+      "height": 220,
+      "anchor": "center",
+      "font_family": "NotoSerifKR-Regular",
+      "font_size": 44,
+      "font_color": "#F0E6D3",
+      "font_weight": "regular",
+      "font_style": "italic",
+      "line_spacing": 1.4,
+      "max_lines": 3,
+      "text_align": "center",
+      "background_color": null,
+      "background_padding": null,
+      "shadow": null,
+      "decorative_line": {
+        "enabled": true,
+        "color": "#C5A55A",
+        "thickness": 2,
+        "width": 200,
+        "position": "below",
+        "margin_top": 16
+      },
+      "animation": {
+        "type": "fade_in",
+        "duration": 0.8,
+        "delay": 0.3
+      }
+    },
+    "caption": {
+      "x": 540,
+      "y": 1670,
+      "width": 960,
+      "height": 110,
+      "anchor": "center",
+      "font_family": "NotoSerifKR-Light",
+      "font_size": 22,
+      "font_color": "#D4C5B0",
+      "font_weight": "light",
+      "line_spacing": 1.5,
+      "max_lines": 2,
+      "text_align": "center",
+      "background_color": null,
+      "background_padding": null,
+      "shadow": {
+        "color": [0, 0, 0, 0.6],
+        "offset_x": 1,
+        "offset_y": 1,
+        "blur": 4
+      },
+      "animation": {
+        "type": "fade_in",
+        "duration": 0.6,
+        "delay": 0.2
+      }
+    },
+    "outro_message": {
+      "x": 540,
+      "y": 880,
+      "width": 900,
+      "height": 180,
+      "anchor": "center",
+      "font_family": "NotoSerifKR-Regular",
+      "font_size": 40,
+      "font_color": "#F0E6D3",
+      "font_weight": "regular",
+      "font_style": "italic",
+      "text_align": "center",
+      "background_color": null,
+      "shadow": null
+    },
+    "branding": {
+      "x": 540,
+      "y": 1830,
+      "width": 700,
+      "height": 55,
+      "anchor": "center",
+      "font_family": "NotoSerifKR-Light",
+      "font_size": 18,
+      "font_color": "#666666",
+      "font_weight": "light",
+      "text_align": "center",
+      "text": "Bucket List App으로 제작",
+      "background_color": null,
+      "shadow": null
+    }
+  },
+
+  "media_area": {
+    "x": 0,
+    "y": 0,
+    "width": 1080,
+    "height": 1920,
+    "fit": "cover",
+    "position": "center",
+    "letterbox": {
+      "enabled": true,
+      "bar_height": 60,
+      "bar_color": "#000000"
+    },
+    "photo_duration": 4.0,
+    "photo_max_duration": 5.0,
+    "video_max_duration": 15.0,
+    "ken_burns": {
+      "enabled": true,
+      "scale_start": 1.0,
+      "scale_end": 1.05,
+      "direction": "slow_right"
+    }
+  },
+
+  "transition": {
+    "type": "zoom",
+    "direction": "in",
+    "scale_from": 1.0,
+    "scale_to": 1.05,
+    "duration": 0.8,
+    "easing": "ease_in_out",
+    "intro_transition": {
+      "type": "fade",
+      "duration": 0.6
+    },
+    "outro_transition": {
+      "type": "fade",
+      "duration": 0.6
+    }
+  },
+
+  "overlay": {
+    "layers": [
+      {
+        "name": "dark_tint",
+        "type": "solid",
+        "color": [0, 0, 0, 0.25],
+        "x": 0,
+        "y": 0,
+        "width": 1080,
+        "height": 1920,
+        "z_index": 5
+      },
+      {
+        "name": "film_grain",
+        "type": "noise",
+        "intensity": 0.08,
+        "animated": true,
+        "fps": 24,
+        "z_index": 20
+      },
+      {
+        "name": "vignette",
+        "type": "radial_gradient",
+        "center_x": 540,
+        "center_y": 960,
+        "inner_radius": 600,
+        "outer_radius": 1200,
+        "inner_color": [0, 0, 0, 0.0],
+        "outer_color": [0, 0, 0, 0.55],
+        "z_index": 15
+      },
+      {
+        "name": "letterbox_top",
+        "type": "solid",
+        "color": [0, 0, 0, 1.0],
+        "x": 0,
+        "y": 0,
+        "width": 1080,
+        "height": 60,
+        "z_index": 25
+      },
+      {
+        "name": "letterbox_bottom",
+        "type": "solid",
+        "color": [0, 0, 0, 1.0],
+        "x": 0,
+        "y": 1860,
+        "width": 1080,
+        "height": 60,
+        "z_index": 25
+      }
+    ]
+  },
+
+  "color_grading": {
+    "enabled": true,
+    "saturation": 0.85,
+    "brightness": 0.95,
+    "contrast": 1.08,
+    "color_temperature": -100,
+    "shadows_lift": [5, 3, 0],
+    "highlights_pull": [0, 0, -5]
+  }
+}
