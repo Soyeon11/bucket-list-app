@@ -1,14 +1,24 @@
-// Home screen: weekly recommendation placeholder card + in-progress items summary
+// Home screen: weekly recommendation card + in-progress items summary
 import React from 'react';
 import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
 import { useUserStore } from '@/store/userStore';
 import { supabase } from '@/services/api';
-import { Button } from '@/components/ui/Button';
+import { RecommendationCard } from '@/components/Recommendation/RecommendationCard';
+import {
+  useCurrentRecommendation,
+  useAcceptRecommendation,
+  useSkipRecommendation,
+} from '@/hooks/useRecommendation';
 
 export default function HomeScreen() {
   const { profile, clearUser } = useUserStore();
   const nickname = profile?.nickname ?? '사용자';
+
+  const { data: recommendation, isLoading } = useCurrentRecommendation();
+  const acceptMutation = useAcceptRecommendation();
+  const skipMutation = useSkipRecommendation();
 
   async function handleLogout() {
     Alert.alert('로그아웃', '정말 로그아웃 하시겠어요?', [
@@ -24,9 +34,22 @@ export default function HomeScreen() {
     ]);
   }
 
+  function handleAccept() {
+    if (!recommendation) return;
+    acceptMutation.mutate(recommendation.id);
+  }
+
+  function handleSkip() {
+    if (!recommendation) return;
+    skipMutation.mutate(recommendation.id);
+  }
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#F9FAFB' }}>
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 24, gap: 20 }}>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 24, gap: 20 }}
+      >
         {/* Header greeting */}
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <View>
@@ -40,24 +63,23 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Weekly recommendation placeholder card */}
-        <View className="rounded-3xl bg-primary p-6 gap-4">
-          <View className="flex-row items-center gap-2">
-            <View className="rounded-full bg-white/20 px-3 py-1">
-              <Text className="text-xs font-medium text-white">이번 주 추천</Text>
-            </View>
-          </View>
-          <Text className="text-xl font-bold text-white">
-            이번 주의 버킷리스트를{'\n'}불러오는 중...
+        {/* Weekly recommendation card */}
+        <RecommendationCard
+          recommendation={recommendation}
+          isLoading={isLoading}
+          onAccept={handleAccept}
+          onSkip={handleSkip}
+        />
+
+        {/* History link */}
+        <TouchableOpacity
+          onPress={() => router.push('/recommendations/history')}
+          style={{ alignItems: 'center', paddingVertical: 4 }}
+        >
+          <Text style={{ fontSize: 14, color: '#6366F1', fontWeight: '600' }}>
+            추천 기록 보기 →
           </Text>
-          <Text className="text-sm text-white/70">
-            이번 주 날씨와 당신의 우선순위를 고려했어요
-          </Text>
-          <View className="flex-row gap-3 mt-2">
-            <Button label="수락" variant="ghost" />
-            <Button label="다음 주로 미루기" variant="ghost" />
-          </View>
-        </View>
+        </TouchableOpacity>
 
         {/* In-progress items section */}
         <View className="gap-3">

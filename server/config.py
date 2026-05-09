@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     supabase_anon_key: str = Field(..., description="Supabase anon/public key")
     supabase_jwt_secret: str = Field(..., description="Supabase JWT signing secret")
 
+    # ── External APIs ─────────────────────────────────────────────────────────
+    openweather_api_key: str = Field(default="")
+
     # ── Redis / Celery (Phase 4) ──────────────────────────────────────────────
     redis_url: str = Field(default="redis://localhost:6379/0")
     celery_broker_url: str = Field(default="redis://localhost:6379/0")
