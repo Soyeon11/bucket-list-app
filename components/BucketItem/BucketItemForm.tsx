@@ -1,6 +1,6 @@
 // Form component for creating or editing a bucket list item
 import React, { useState } from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { CATEGORIES, PRIORITIES, CategoryId, Priority } from '@/constants/categories';
 import { CreateItemPayload, UpdateItemPayload } from '@/services/bucketlist';
 import { Button } from '@/components/ui/Button';
@@ -88,6 +88,10 @@ export function BucketItemForm({
 
   // ─── Render ─────────────────────────────────────────────────────────────────
   return (
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1 }}
+    >
     <ScrollView
       className="flex-1 bg-surface"
       keyboardShouldPersistTaps="handled"
@@ -246,5 +250,6 @@ export function BucketItemForm({
         </View>
       </View>
     </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
