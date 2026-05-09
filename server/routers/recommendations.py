@@ -92,10 +92,11 @@ async def generate_recommendation_now(
     Delete the existing recommendation for the current week (if any) and
     immediately generate a new one.  Intended for development/testing only.
     """
-    from datetime import date, timedelta
+    from datetime import datetime, timedelta, timezone
 
-    # Determine this week's Monday
-    today = date.today()
+    # Determine this week's Monday in KST (matches RecommenderService._get_week_start)
+    _KST = timezone(timedelta(hours=9))
+    today = datetime.now(_KST).date()
     week_start = today - timedelta(days=today.weekday())
 
     # Delete any existing recommendation for this week
