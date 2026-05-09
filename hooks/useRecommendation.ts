@@ -52,14 +52,14 @@ export function useAcceptRecommendation() {
   return useMutation({
     mutationFn: (recId: string) => acceptRecommendation(recId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: recommendationKeys.current() });
+      queryClient.invalidateQueries({ queryKey: recommendationKeys.all });
     },
   });
 }
 
 /**
  * Skip the current week's recommendation.
- * Invalidates current recommendation on success.
+ * Invalidates all recommendation queries (current + history) on success.
  */
 export function useSkipRecommendation() {
   const queryClient = useQueryClient();
@@ -67,7 +67,7 @@ export function useSkipRecommendation() {
   return useMutation({
     mutationFn: (recId: string) => skipRecommendation(recId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: recommendationKeys.current() });
+      queryClient.invalidateQueries({ queryKey: recommendationKeys.all });
     },
   });
 }
@@ -82,7 +82,7 @@ export function useGenerateRecommendation() {
   return useMutation({
     mutationFn: generateRecommendationNow,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: recommendationKeys.current() });
+      queryClient.invalidateQueries({ queryKey: recommendationKeys.all });
     },
   });
 }
