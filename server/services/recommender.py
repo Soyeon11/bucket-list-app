@@ -195,10 +195,10 @@ class RecommenderService:
             .select("*")
             .eq("user_id", str(user_id))
             .eq("week_start", str(week_start))
-            .maybe_single()
+            .limit(1)
             .execute()
         )
-        return result.data or None
+        return result.data[0] if result.data else None
 
     async def _create_recommendation(
         self,
@@ -222,6 +222,8 @@ class RecommenderService:
         }
 
         result = self._db.table("weekly_recommendations").insert(payload).execute()
+        if not result.data:
+            raise RuntimeError("weekly_recommendations insert returned no data")
         rec = result.data[0]
 
         # Update last_recommended_at on the bucket item
@@ -316,10 +318,10 @@ class RecommenderService:
                 self._db.table("bucket_items")
                 .select("id, title, category, priority")
                 .eq("id", str(item_id))
-                .maybe_single()
+                .limit(1)
                 .execute()
             )
-            rec = {**rec, "item": item_result.data or {}}
+            rec = {**rec, "item": item_result.data[0] if item_result.data else {}}
         return rec
 
     @staticmethod

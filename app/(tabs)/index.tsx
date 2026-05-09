@@ -10,6 +10,7 @@ import {
   useCurrentRecommendation,
   useAcceptRecommendation,
   useSkipRecommendation,
+  useGenerateRecommendation,
 } from '@/hooks/useRecommendation';
 
 export default function HomeScreen() {
@@ -19,6 +20,7 @@ export default function HomeScreen() {
   const { data: recommendation, isLoading } = useCurrentRecommendation();
   const acceptMutation = useAcceptRecommendation();
   const skipMutation = useSkipRecommendation();
+  const generateMutation = useGenerateRecommendation();
 
   async function handleLogout() {
     Alert.alert('로그아웃', '정말 로그아웃 하시겠어요?', [
@@ -78,6 +80,24 @@ export default function HomeScreen() {
         >
           <Text style={{ fontSize: 14, color: '#6366F1', fontWeight: '600' }}>
             추천 기록 보기 →
+          </Text>
+        </TouchableOpacity>
+
+        {/* DEV: generate recommendation button — remove before production */}
+        <TouchableOpacity
+          onPress={() =>
+            generateMutation.mutate(undefined, {
+              onError: (e: any) => {
+                const msg = e?.response?.data?.detail?.error?.message ?? e?.message ?? '알 수 없는 오류';
+                Alert.alert('[DEV] 추천 생성 실패', msg);
+              },
+            })
+          }
+          disabled={generateMutation.isPending}
+          style={{ alignItems: 'center', paddingVertical: 6, opacity: generateMutation.isPending ? 0.5 : 1 }}
+        >
+          <Text style={{ fontSize: 12, color: '#9CA3AF' }}>
+            {generateMutation.isPending ? '추천 생성 중...' : '[DEV] 추천 새로 생성'}
           </Text>
         </TouchableOpacity>
 

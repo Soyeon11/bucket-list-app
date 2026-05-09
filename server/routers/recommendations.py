@@ -99,7 +99,7 @@ async def generate_recommendation_now(
     today = datetime.now(_KST).date()
     week_start = today - timedelta(days=today.weekday())
 
-    # Delete any existing recommendation for this week
+    # Delete any existing recommendation for this week (all statuses)
     db.table("weekly_recommendations").delete().eq(
         "user_id", str(user_id)
     ).eq("week_start", week_start.isoformat()).execute()
