@@ -16,7 +16,7 @@ from pydantic import BaseModel, Field, field_validator, model_validator
 
 # ── Enum literals ──────────────────────────────────────────────────────────────
 
-CATEGORY_VALUES = ("travel", "food", "hobby", "fitness", "culture", "etc")
+CATEGORY_VALUES = ("travel", "food", "hobby", "fitness", "culture", "outdoor", "etc")
 PRIORITY_VALUES = ("high", "medium", "low")
 STATUS_VALUES = ("active", "completed")
 
