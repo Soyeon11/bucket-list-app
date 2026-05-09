@@ -225,21 +225,25 @@ export function BucketItemForm({
       </View>
 
       {/* Action buttons */}
-      <View className="flex-row gap-3 pt-2 pb-8">
-        <Button
-          label="취소"
-          variant="secondary"
-          onPress={onCancel}
-          fullWidth
-          disabled={isLoading}
-        />
-        <Button
-          label={submitLabel}
-          variant="primary"
-          onPress={handleSubmit}
-          isLoading={isLoading}
-          fullWidth
-        />
+      <View style={{ flexDirection: 'row', gap: 12, paddingTop: 8, paddingBottom: 32 }}>
+        <View style={{ flex: 1 }}>
+          <Button
+            label="취소"
+            variant="secondary"
+            onPress={onCancel}
+            fullWidth
+            disabled={isLoading}
+          />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Button
+            label={submitLabel}
+            variant="primary"
+            onPress={handleSubmit}
+            isLoading={isLoading}
+            fullWidth
+          />
+        </View>
       </View>
     </ScrollView>
   );
